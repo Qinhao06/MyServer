@@ -4,10 +4,30 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 import java.util.Objects;
 
 public class MyServer {
-    private String content = "";
+
+    private static ObjectOutputStream fout;
+
+    private static ObjectInputStream fin;
+
+    private static Daolmpl daolmpl ;
+
+
+    private static final DAO Daolmpl  ;
+
+    static {
+        try {
+            fout = new ObjectOutputStream(new FileOutputStream(new File("src/record.dat")));
+            fin = new ObjectInputStream(new FileInputStream(new File("src/record.dat")));
+            Daolmpl = new Daolmpl();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void main(String args[]){
         new MyServer();
     }
@@ -37,25 +57,13 @@ public class MyServer {
 
         private PrintWriter pout = null;
 
-        private static ObjectOutputStream fout;
 
-        private static ObjectInputStream fin;
-
-
-        static {
-            try {
-                fout = new ObjectOutputStream(new FileOutputStream(new File("src/record.dat")));
-                fin = new ObjectInputStream(new FileInputStream(new File("src/record.dat")));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
 
         public Service(Socket socket){
             this.socket = socket;
             try{
                     in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                pout = new PrintWriter(new BufferedWriter(
+                    pout = new PrintWriter(new BufferedWriter(
                         new OutputStreamWriter(socket.getOutputStream(),"utf-8")),true);
 
             }catch (IOException ex){
@@ -84,16 +92,22 @@ public class MyServer {
 
 
         public void sendMessge(Socket socket, String message) {
-            System.out.println("messge to client:" + message);
+            System.out.println("message to client:" + message);
             pout.println(message);
         }
 
-        public void login() throws IOException {
+        public void login() throws IOException, ClassNotFoundException {
             String name = in.readLine();
             String password = in.readLine();
             System.out.println(name);
             System.out.println(password);
-
+            List<Record> recordList = daolmpl.getAll("src/record.dat");
+            for(Record record : recordList){
+                if(name.equals(record.getName()) && password.equals(record.getPassword())){
+                    System.out.println("match success");
+                    pout.println("finish");
+                }
+            }
             if(Objects.equals(name, "1") && Objects.equals(password, "1")){
                 pout.println("finish");
             }
@@ -108,7 +122,7 @@ public class MyServer {
             fout.writeObject(record);
             pout.println("finish");
             pout.println("enroll success");
-            System.out.println("client enroll");
+            System.out.println("client enroll success");
         }
     }
 }
