@@ -1,6 +1,10 @@
 import java.io.Serializable;
 
 public class Record implements Serializable {
+
+    private String name;
+    private String password;
+
     public String getName() {
         return name;
     }
@@ -16,9 +20,6 @@ public class Record implements Serializable {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    private String name;
-    private String password;
 
     public Record(String name, String password) {
         this.name = name;
