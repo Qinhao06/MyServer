@@ -9,6 +9,10 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author lxl,qh
@@ -20,6 +24,16 @@ public class MyServer {
     private static final String END = "finish";
     private static final String LOGIN = "login success";
     private static final String ENROLL = "enroll success";
+    private static final String EASY_GAME = "easy";
+    private static final String MEDIUM_GAME = "medium";
+    private static final String HARD_GAME = "difficult";
+    private static final String GAME_OVER = "game over!";
+    private static final Pattern PATTERN = Pattern.compile("[0-9]*");
+
+
+    private static final List<Player> EASY_PLAYER_LIST = new ArrayList<>();
+    private static final List<Player> MEDIUM_PLAYER_LIST = new ArrayList<>();
+    private static final List<Player> DIFFICULT_PLAYER_LIST = new ArrayList<>();
 
     private final UserDao daolmpl = new UserDaolmpl();
 
@@ -70,7 +84,6 @@ public class MyServer {
         public void run() {
             System.out.println("wait client message " );
             try {
-
                 if(Integer.parseInt(in.readLine()) == 1) {
                     enroll();
                 }
@@ -99,6 +112,8 @@ public class MyServer {
                    sendMessage(END);
                    sendMessage(LOGIN);
                    System.out.println("client login success");
+                   System.out.println("waiting for match");
+                   playerMatch(name);
                }else{
                    System.out.println("password wrong");
                    System.out.println("client login failed");
@@ -108,6 +123,70 @@ public class MyServer {
                 System.out.println("client login failed");
             }
         }
+
+        public void playerMatch(String name){
+            String message = null;
+            try{
+                message = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(message != null){
+                while(!message.equals(GAME_OVER)){
+                    Player player = new Player(name, 0);
+                    if(!isNumeric(message)){
+                        createMatch(message, player);
+                    }else{
+                        player.setScore(Integer.parseInt(message));
+                        int opponentScore = player.getOpponent().getScore();
+                        sendMessage(Integer.toString(opponentScore));
+                    }
+                }
+            }
+        }
+
+        public void createMatch(String message, Player player){
+            switch (message) {
+                case EASY_GAME:
+                    synchronized (EASY_PLAYER_LIST) {
+                        if (EASY_PLAYER_LIST.size() == 1) {
+                            player.setOpponent(EASY_PLAYER_LIST.get(0));
+                            EASY_PLAYER_LIST.get(0).setOpponent(player);
+                            EASY_PLAYER_LIST.remove(0);
+                        } else if (EASY_PLAYER_LIST.size() == 0) {
+                            EASY_PLAYER_LIST.add(player);
+                        }
+                    }
+                    break;
+                case MEDIUM_GAME:
+                    synchronized (MEDIUM_PLAYER_LIST) {
+                        if (MEDIUM_PLAYER_LIST.size() == 1) {
+                            player.setOpponent(MEDIUM_PLAYER_LIST.get(0));
+                            MEDIUM_PLAYER_LIST.get(0).setOpponent(player);
+                            MEDIUM_PLAYER_LIST.remove(0);
+                        } else if (MEDIUM_PLAYER_LIST.size() == 0) {
+                            MEDIUM_PLAYER_LIST.add(player);
+                        }
+                    }
+                    break;
+                case HARD_GAME:
+                    synchronized (DIFFICULT_PLAYER_LIST) {
+                        if (DIFFICULT_PLAYER_LIST.size() == 1) {
+                            player.setOpponent(DIFFICULT_PLAYER_LIST.get(0));
+                            DIFFICULT_PLAYER_LIST.get(0).setOpponent(player);
+                            DIFFICULT_PLAYER_LIST.remove(0);
+                        } else if (DIFFICULT_PLAYER_LIST.size() == 0) {
+                            DIFFICULT_PLAYER_LIST.add(player);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        public boolean isNumeric(String message){
+            return PATTERN.matcher(message).matches();
+        }
+
 
         public void enroll() throws IOException {
             String name = in.readLine();
@@ -123,7 +202,6 @@ public class MyServer {
                 sendMessage(ENROLL);
                 System.out.println("client enroll success");
             }
-
         }
     }
 }
