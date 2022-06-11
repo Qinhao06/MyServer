@@ -1,5 +1,9 @@
 
 
+import UserDao.UserDao;
+import UserDao.UserDaolmpl;
+import UserDao.Record;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -13,7 +17,11 @@ public class MyServer {
 
     private static final String PATH = "src/record.dat";
 
-    private final Dao daolmpl = new Daolmpl();
+    private static final String END = "finish";
+    private static final String LOGIN = "login success";
+    private static final String ENROLL = "enroll success";
+
+    private final UserDao daolmpl = new UserDaolmpl();
 
     public static void main(String[] args){
         new MyServer();
@@ -88,13 +96,16 @@ public class MyServer {
             if(daolmpl.findByName(name) != null){
                record = daolmpl.findByName(name);
                if(daolmpl.compareByPassword(record, password)){
-                   pout.println("finish");
-                   System.out.println("login success");
+                   sendMessage(END);
+                   sendMessage(LOGIN);
+                   System.out.println("client login success");
                }else{
                    System.out.println("password wrong");
+                   System.out.println("client login failed");
                }
             }else{
                 System.out.println("name not exist!");
+                System.out.println("client login failed");
             }
         }
 
@@ -108,8 +119,8 @@ public class MyServer {
                 Record record = new Record(name, password);
                 daolmpl.doAdd(record);
                 daolmpl.writeFile(PATH);
-                pout.println("finish");
-                pout.println("enroll success");
+                sendMessage(END);
+                sendMessage(ENROLL);
                 System.out.println("client enroll success");
             }
 

@@ -1,18 +1,18 @@
+package UserDao;
+
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author lxl,qh
  */
-public class Daolmpl implements Dao {
+public class UserDaolmpl implements UserDao {
 
     private List<Record> records;
 
-    public Daolmpl(){
-        records = new ArrayList<Record>();
+    public UserDaolmpl(){
+        records = new ArrayList<>();
     }
 
     @Override

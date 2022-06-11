@@ -1,15 +1,9 @@
-
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+package UserDao;
 
 /**
  * @author lxl
  */
-public interface Dao {
+public interface UserDao {
     /**
      * 删除接口
      */
