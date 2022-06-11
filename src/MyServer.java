@@ -1,11 +1,6 @@
 
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -42,12 +37,27 @@ public class MyServer {
 
         private PrintWriter pout = null;
 
+        private static ObjectOutputStream fout;
+
+        private static ObjectInputStream fin;
+
+
+        static {
+            try {
+                fout = new ObjectOutputStream(new FileOutputStream(new File("src/record.dat")));
+                fin = new ObjectInputStream(new FileInputStream(new File("src/record.dat")));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         public Service(Socket socket){
             this.socket = socket;
             try{
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 pout = new PrintWriter(new BufferedWriter(
                         new OutputStreamWriter(socket.getOutputStream(),"utf-8")),true);
+
             }catch (IOException ex){
                 ex.printStackTrace();
             }
@@ -58,12 +68,21 @@ public class MyServer {
         public void run() {
             System.out.println("wait client message " );
             try {
-                login();
+
+                if(Integer.parseInt(in.readLine()) == 1) {
+                    enroll();
+                }
+                else {
+                    login();
+                }
+
 
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
+
+
         public void sendMessge(Socket socket, String message) {
             System.out.println("messge to client:" + message);
             pout.println(message);
@@ -74,11 +93,22 @@ public class MyServer {
             String password = in.readLine();
             System.out.println(name);
             System.out.println(password);
+
             if(Objects.equals(name, "1") && Objects.equals(password, "1")){
                 pout.println("finish");
             }
 
 
+        }
+
+        public void enroll() throws IOException {
+            String name = in.readLine();
+            String password = in.readLine();
+            Record record = new Record(name, password);
+            fout.writeObject(record);
+            pout.println("finish");
+            pout.println("enroll success");
+            System.out.println("client enroll");
         }
     }
 }
