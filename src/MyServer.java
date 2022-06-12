@@ -28,6 +28,7 @@ public class MyServer {
     private static final String MEDIUM_GAME = "medium";
     private static final String HARD_GAME = "difficult";
     private static final String GAME_OVER = "game over!";
+    private static final String START = "start";
     private static final Pattern PATTERN = Pattern.compile("[0-9]*");
 
 
@@ -153,6 +154,7 @@ public class MyServer {
                             player.setOpponent(EASY_PLAYER_LIST.get(0));
                             EASY_PLAYER_LIST.get(0).setOpponent(player);
                             EASY_PLAYER_LIST.remove(0);
+                            sendMessage(START);
                         } else if (EASY_PLAYER_LIST.size() == 0) {
                             EASY_PLAYER_LIST.add(player);
                         }
@@ -164,6 +166,7 @@ public class MyServer {
                             player.setOpponent(MEDIUM_PLAYER_LIST.get(0));
                             MEDIUM_PLAYER_LIST.get(0).setOpponent(player);
                             MEDIUM_PLAYER_LIST.remove(0);
+                            sendMessage(START);
                         } else if (MEDIUM_PLAYER_LIST.size() == 0) {
                             MEDIUM_PLAYER_LIST.add(player);
                         }
@@ -175,11 +178,13 @@ public class MyServer {
                             player.setOpponent(DIFFICULT_PLAYER_LIST.get(0));
                             DIFFICULT_PLAYER_LIST.get(0).setOpponent(player);
                             DIFFICULT_PLAYER_LIST.remove(0);
+                            sendMessage(START);
                         } else if (DIFFICULT_PLAYER_LIST.size() == 0) {
                             DIFFICULT_PLAYER_LIST.add(player);
                         }
                     }
                     break;
+                default: break;
             }
         }
 
