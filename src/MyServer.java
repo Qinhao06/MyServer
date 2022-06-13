@@ -134,34 +134,30 @@ public class MyServer {
             if(message != null && !isNumeric(message) && !message.equals(GAME_OVER)){
                 player = new Player(name, 0);
                 createMatch(message, player);
-                try{
-                    message = in.readLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                while(true){
+                    if(player.getMatch()){
+                        sendMessage(START);
+                        break;
+                    }
                 }
             }
 
-            while(message == null){
-                if(player != null)
-                {
-                    if(player.getMatch()){
-                        sendMessage(START);
-                    }
-                }
-                try{
-                    message = in.readLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try{
+                message = in.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            while(!message.equals(GAME_OVER) && player != null){
-                player.setScore(Integer.parseInt(message));
-                int opponentScore = player.getOpponent().getScore();
-                sendMessage(Integer.toString(opponentScore));
-                try{
-                    message = in.readLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
+
+            if(message != null){
+                while(!message.equals(GAME_OVER) && player != null){
+                    player.setScore(Integer.parseInt(message));
+                    int opponentScore = player.getOpponent().getScore();
+                    sendMessage(Integer.toString(opponentScore));
+                    try{
+                        message = in.readLine();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
