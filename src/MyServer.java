@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.regex.Pattern;
 
 /**
@@ -36,6 +38,7 @@ public class MyServer {
 
     private final UserDao daolmpl = new UserDaolmpl();
 
+    private static ThreadPoolExecutor threadPoolExecutor = new ScheduledThreadPoolExecutor(10);
     public static void main(String[] args){
         new MyServer();
     }
@@ -52,7 +55,7 @@ public class MyServer {
                 System.out.println("waiting client connect");
                 Socket socket = serverSocket.accept();
                 System.out.println("accept client connect" + socket);
-                new Thread(new Service(socket)).start();
+                threadPoolExecutor.execute(new Service(socket));
             }
         }catch (Exception ex){
             ex.printStackTrace();
@@ -100,6 +103,7 @@ public class MyServer {
             pout.println(message);
         }
 
+
         public void login() throws IOException {
             Record record;
             String name = in.readLine();
@@ -135,6 +139,7 @@ public class MyServer {
                 player = new Player(name, 0);
                 createMatch(message, player);
                 while(true){
+                    System.out.print("");
                     if(player.getMatch()){
                         sendMessage(START);
                         break;
@@ -170,7 +175,9 @@ public class MyServer {
                             player.setOpponent(EASY_PLAYER_LIST.get(0));
                             EASY_PLAYER_LIST.get(0).setOpponent(player);
                             player.setMatch(true);
+                            System.out.println("player" + player.getMatch());
                             EASY_PLAYER_LIST.get(0).setMatch(true);
+                            System.out.println(EASY_PLAYER_LIST.get(0).getMatch());
                             EASY_PLAYER_LIST.remove(0);
                         } else if (EASY_PLAYER_LIST.size() == 0) {
                             EASY_PLAYER_LIST.add(player);

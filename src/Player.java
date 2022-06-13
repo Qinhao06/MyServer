@@ -8,6 +8,8 @@ public class Player {
     private Player opponent;
     private boolean match = false;
 
+    private boolean isMatch;
+
     public Player(String name, int score){
         this.name = name;
         this.score = score;
