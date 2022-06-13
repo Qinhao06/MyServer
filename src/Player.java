@@ -6,6 +6,7 @@ public class Player {
     private String name;
     private int score;
     private Player opponent;
+    private boolean match = false;
 
     public Player(String name, int score){
         this.name = name;
@@ -20,9 +21,14 @@ public class Player {
         return name;
     }
 
+    public boolean getMatch(){return match;}
+
     public Player getOpponent(){
         return opponent;
     }
+
+
+    public void setMatch(boolean match) {this.match = match; }
 
     public void setOpponent(Player opponent){
         this.opponent = opponent;

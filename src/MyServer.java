@@ -140,7 +140,14 @@ public class MyServer {
                     e.printStackTrace();
                 }
             }
+
             while(message == null){
+                if(player != null)
+                {
+                    if(player.getMatch()){
+                        sendMessage(START);
+                    }
+                }
                 try{
                     message = in.readLine();
                 } catch (IOException e) {
@@ -166,8 +173,9 @@ public class MyServer {
                         if (EASY_PLAYER_LIST.size() == 1) {
                             player.setOpponent(EASY_PLAYER_LIST.get(0));
                             EASY_PLAYER_LIST.get(0).setOpponent(player);
+                            player.setMatch(true);
+                            EASY_PLAYER_LIST.get(0).setMatch(true);
                             EASY_PLAYER_LIST.remove(0);
-                            sendMessage(START);
                         } else if (EASY_PLAYER_LIST.size() == 0) {
                             EASY_PLAYER_LIST.add(player);
                         }
@@ -178,8 +186,9 @@ public class MyServer {
                         if (MEDIUM_PLAYER_LIST.size() == 1) {
                             player.setOpponent(MEDIUM_PLAYER_LIST.get(0));
                             MEDIUM_PLAYER_LIST.get(0).setOpponent(player);
+                            player.setMatch(true);
+                            EASY_PLAYER_LIST.get(0).setMatch(true);
                             MEDIUM_PLAYER_LIST.remove(0);
-                            sendMessage(START);
                         } else if (MEDIUM_PLAYER_LIST.size() == 0) {
                             MEDIUM_PLAYER_LIST.add(player);
                         }
@@ -190,8 +199,9 @@ public class MyServer {
                         if (DIFFICULT_PLAYER_LIST.size() == 1) {
                             player.setOpponent(DIFFICULT_PLAYER_LIST.get(0));
                             DIFFICULT_PLAYER_LIST.get(0).setOpponent(player);
+                            player.setMatch(true);
+                            EASY_PLAYER_LIST.get(0).setMatch(true);
                             DIFFICULT_PLAYER_LIST.remove(0);
-                            sendMessage(START);
                         } else if (DIFFICULT_PLAYER_LIST.size() == 0) {
                             DIFFICULT_PLAYER_LIST.add(player);
                         }
