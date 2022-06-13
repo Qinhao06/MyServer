@@ -45,6 +45,7 @@ public class UserDaolmpl implements UserDao {
         records = new ArrayList<>();
         try {
             ois = new ObjectInputStream(new FileInputStream(path));
+            System.out.println(ois);
             Record player = (Record) ois.readObject();
             while(player != null){
                 records.add(player);

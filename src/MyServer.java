@@ -22,8 +22,6 @@ public class MyServer {
     private static final String PATH = "src/record.dat";
 
     private static final String END = "finish";
-    private static final String LOGIN = "login success";
-    private static final String ENROLL = "enroll success";
     private static final String EASY_GAME = "easy";
     private static final String MEDIUM_GAME = "medium";
     private static final String HARD_GAME = "difficult";
@@ -111,7 +109,6 @@ public class MyServer {
                record = daolmpl.findByName(name);
                if(daolmpl.compareByPassword(record, password)){
                    sendMessage(END);
-                   sendMessage(LOGIN);
                    System.out.println("client login success");
                    System.out.println("waiting for match");
                    playerMatch(name);
@@ -127,21 +124,37 @@ public class MyServer {
 
         public void playerMatch(String name){
             String message = null;
+            Player player = null;
             try{
                 message = in.readLine();
+                System.out.println(message);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if(message != null){
-                while(!message.equals(GAME_OVER)){
-                    Player player = new Player(name, 0);
-                    if(!isNumeric(message)){
-                        createMatch(message, player);
-                    }else{
-                        player.setScore(Integer.parseInt(message));
-                        int opponentScore = player.getOpponent().getScore();
-                        sendMessage(Integer.toString(opponentScore));
-                    }
+            if(message != null && !isNumeric(message) && !message.equals(GAME_OVER)){
+                player = new Player(name, 0);
+                createMatch(message, player);
+                try{
+                    message = in.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            while(message == null){
+                try{
+                    message = in.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            while(!message.equals(GAME_OVER) && player != null){
+                player.setScore(Integer.parseInt(message));
+                int opponentScore = player.getOpponent().getScore();
+                sendMessage(Integer.toString(opponentScore));
+                try{
+                    message = in.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -197,14 +210,12 @@ public class MyServer {
             String name = in.readLine();
             String password = in.readLine();
             if(daolmpl.findByName(name) != null){
-                pout.println("name has existed");
                 System.out.println("client enroll failed");
             }else{
                 Record record = new Record(name, password);
                 daolmpl.doAdd(record);
                 daolmpl.writeFile(PATH);
                 sendMessage(END);
-                sendMessage(ENROLL);
                 System.out.println("client enroll success");
             }
         }
